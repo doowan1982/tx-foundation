@@ -1,0 +1,4 @@
+/vendor/
+/tests/test.xml
+/tests/index.html
+composer.lock
