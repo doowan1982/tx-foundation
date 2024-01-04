@@ -1,0 +1,82 @@
+{
+    "content": [
+        {
+            "organization_id": "33432523",
+            "parent_organization_id": "1",
+            "data_original_id": "0",
+            "data_original": "1",
+            "sub_organization_set": "1187",
+            "all_sub_organization_set": "",
+            "full_name": "行政事业部",
+            "organization_form": "3",
+            "sequence": "0"
+        },
+        {
+            "organization_id": "1181256",
+            "parent_organization_id": "526562555",
+            "data_original_id": "0",
+            "data_original": "1",
+            "sub_organization_set": "1187",
+            "all_sub_organization_set": "",
+            "full_name": "研发二部",
+            "organization_form": "3",
+            "sequence": "0"
+        },
+        {
+            "organization_id": "11855456",
+            "parent_organization_id": "526562555",
+            "data_original_id": "0",
+            "data_original": "1",
+            "sub_organization_set": "1187",
+            "all_sub_organization_set": "",
+            "full_name": "研发一部",
+            "organization_form": "3",
+            "sequence": "0"
+        },
+        {
+            "organization_id": "1",
+            "parent_organization_id": "0",
+            "data_original_id": "1",
+            "data_original": "2",
+            "sub_organization_set": "",
+            "all_sub_organization_set": "",
+            "full_name": "总公司",
+            "organization_form": "0",
+            "sequence": "0"
+        },
+        {
+            "organization_id": "526562555",
+            "parent_organization_id": "839878648",
+            "data_original_id": "0",
+            "data_original": "1",
+            "sub_organization_set": "1187",
+            "all_sub_organization_set": "",
+            "full_name": "产品事业部",
+            "organization_form": "3",
+            "sequence": "0"
+        },
+        {
+            "organization_id": "839878648",
+            "parent_organization_id": "1",
+            "data_original_id": "0",
+            "data_original": "1",
+            "sub_organization_set": "87",
+            "all_sub_organization_set": "",
+            "full_name": "研发中心",
+            "organization_form": "3",
+            "sequence": "0"
+        },
+        {
+            "organization_id": "45232648",
+            "parent_organization_id": "1",
+            "data_original_id": "0",
+            "data_original": "1",
+            "sub_organization_set": "87",
+            "all_sub_organization_set": "",
+            "full_name": "营销中心",
+            "organization_form": "3",
+            "sequence": "0"
+        }
+    ],
+    "type": 8
+}

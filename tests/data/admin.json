@@ -1,0 +1,60 @@
+{
+    "content": [
+        {
+            "admin_id":244326,
+            "username":"15538091872",
+            "nickname":"邵经超2",
+            "employee_no":"123",
+            "realname":"",
+            "sex":0,
+            "phone":"15538091872",
+            "email":"",
+            "status":0,
+            "local_status":1,
+            "department_id":82,
+            "department_name":"市场一部",
+            "department_unique_name":"TX00013",
+            "subjects":[
+                {
+                    "subject_name":"语文",
+                    "unique_name":"XK00001",
+                    "subject_id":87
+                },
+                {
+                    "subject_name":"数学",
+                    "unique_name":"XK00002",
+                    "subject_id":88
+                }
+            ],
+            "periods":[
+                {
+                    "period_name":"小学",
+                    "unique_name":"XD00001",
+                    "period_id":147
+                }
+            ],
+            "employee_id": 129,
+            "employee": {
+                "id": 129,
+                "avatar": "https://static-legacy.dingtalk.com/media/sadfsd.jpg",
+                "real_name": "张三",
+                "job": 68,
+                "job_number": 2000011,
+                "superior_id": 0,
+                "contact": "",
+                                "platform":{
+                                        "user_id":"钉钉用户id",
+                                        "union_id":"钉钉唯一标识"
+                                },
+                "organization": [
+                  {
+                    "id": 217367091,
+                    "name": "数字网络平台部",
+                    "is_leader": "是否该部门领导，1为是，0为不是",
+                    "form": 0
+                  }
+                ]
+            }
+        }
+    ]
+}

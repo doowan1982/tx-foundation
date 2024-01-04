@@ -36,5 +36,10 @@ class Constant{
      * 职位推送
      */
     const JOBS_PUSH_TYPE = 7;
+    
+    /**
+     * 职位推送
+     */
+    const ORGANIZATION_PUSH_TYPE = 8;
 
 }

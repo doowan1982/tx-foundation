@@ -4,7 +4,7 @@ namespace Tesoon\Foundation;
 /**
  * header中的authentication数据模型
  */
-class Authentication{
+class Authentication extends GeneralObject{
 
     /**
      * @var string
@@ -19,6 +19,14 @@ class Authentication{
     /**
      * @var array
      */
-    public $data = [];
+    private $data = [];
+
+    public function setBody(array $data){
+        $this->data = $data;
+    }
+
+    public function getBody():array{
+        return $this->data;
+    }
 
 }

@@ -4,7 +4,7 @@ namespace Tesoon\Foundation;
 /**
  * 当前应用信息模型
  */
-class Application{
+class Application extends GeneralObject{
 
     /**
      * 应用id

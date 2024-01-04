@@ -1,0 +1,19 @@
+{
+	"content": [{
+		"id": "2",
+		"name": "总监",
+		"sequence": "0"
+	}, {
+		"id": "3",
+		"name": "经理",
+		"sequence": "0"
+	}, {
+		"id": "4",
+		"name": "教育测评研究员",
+		"sequence": "0"
+	}, {
+		"id": "5",
+		"name": "数学责编",
+		"sequence": "0"
+	}]
+}

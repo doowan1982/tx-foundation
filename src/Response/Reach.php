@@ -3,9 +3,10 @@ namespace Tesoon\Foundation\Response;
 
 use Tesoon\Foundation\Application;
 use Tesoon\Foundation\Authentication;
+use Tesoon\Foundation\Models\DataFactory;
 use Tesoon\Foundation\Signature;
 use Tesoon\Foundation\Exceptions\SignatureInvalidException;
-use Tesoon\Foundation\Response\Models\Data;
+use Tesoon\Foundation\Models\Data;
 
 class Reach{
 
@@ -24,19 +25,19 @@ class Reach{
      * @throws SignatureInvalidException
      */
     public function get(Authentication $authentication): ?Data{
-        if(!$this->signature->check($this->application, $authentication)){
+        if(!$this->signature->check($authentication)){
             throw new SignatureInvalidException($authentication, '验证失败');
         }
-        return $this->createBy($authentication->data);
+        return $this->createBy($authentication->getBody());
     }
 
     /**
      * 将data数据转为具体的Data模型对象
+     * @param array $data
      * @return Data|null
      */
     protected function createBy(array $data): ?Data{
-        //todo
-        return null;
+        return DataFactory::build($data['type'], $data['content']);
     }
 
 }

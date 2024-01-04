@@ -5,8 +5,30 @@
 ### 目录描述：
     src/:
         Request为对中台的数据请求，如对中台发送请求（签名验证转发以及其他的数据处理逻辑）
+            // todo
         Response为接收中台的数据请求（由中台主动推送的数据）
             Models是对于中台接收各项数据的封装以提供给各系统使用
 
     tests/:
-        .\vendor\bin\phpunit --testdox-html ./tests/index.html --log-junit ./tests/test.xml .\tests\Response\ReachTest
+        .\vendor\bin\phpunit --testdox-html ./tests/index.html --log-junit ./tests/test.xml --colors=always  -v  .\tests\
+
+### Response/Reach使用示例：
+```php
+    /**
+     * 根据ticket内容来返回对应的Data子类（Tesoon\Foundation\Models\*）
+     * @return Data|null 如果失败
+     */
+    function parse(string $ticket): ?Data{
+        $authentication = new Authentication();
+        $authentication->signature = $ticket;
+        $application = new Application('应用id', '应用key');
+        $reach = new Reach($application, new Signature($application));
+        try{
+            return $reach->get($authentication);
+        }catch(SignatureInvalidException $e){
+            throw $e;
+        }
+        return null;
+    }
+    
+```

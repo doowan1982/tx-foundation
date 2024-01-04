@@ -1,6 +1,8 @@
 <?php
 namespace Tesoon\Foundation;
 
+use Tesoon\Foundation\Exceptions\TokenVerifyException;
+
 /**
  * 该接口提供一个抽象实现
  * 出于安全考虑，具体实现不在本项目中体现
@@ -9,21 +11,19 @@ namespace Tesoon\Foundation;
 interface Signature{
 
     /**
-     * 通过指定Application以及data来计算签名
-     * @param Application $application
-     * @param int $timestamp
-     * @param array $data
-     * @return string
+     * 计算签名
+     * @parma SignatureSetting $setting
+     * @return Authentication
+     * @throw TokenException
      */
-    public function encrypt(Application $application, int $timestamp, array $data): string;
-
+    public function encrypt(SignatureSetting $setting): Authentication;
 
     /**
      * 检查指定authentication是否有效
-     * @param Application $application
      * @param Authentication $authentication
      * @return bool
+     * @throws TokenVerifyException
      */
-    public function check(Application $application, Authentication $authentication): bool;
+    public function check(Authentication $authentication): bool;
 
 }
