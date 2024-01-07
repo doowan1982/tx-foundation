@@ -3,30 +3,16 @@ namespace Tesoon\Foundation;
 
 class LoggerFactory{
 
-    private static $loggers;
-
-    public function export(){
-        foreach(static::$loggers as $class => $logger){
-            
-        }
-    }
-
-    public function __construct(){
-        
-    }
+    private static $logger;
 
     /**
-     * @param string|object
      * @return Logger
      */
-    public function getLogger($class): Logger{
-        if(is_object($class)){
-            $class = get_class($class);
+    public static function logger(): Logger{
+        if(static::$logger === null){
+            static::$logger = new Logger();
         }
-        if(!isset(static::$loggers[$class])){
-            static::$loggers[$class] = new Logger($class);
-        }
-        return static::$loggers[$class];
+        return static::$logger;
     }
 
 }

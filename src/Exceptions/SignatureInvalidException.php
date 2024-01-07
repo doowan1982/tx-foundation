@@ -3,7 +3,7 @@ namespace Tesoon\Foundation\Exceptions;
 
 use Tesoon\Foundation\Authentication;
 
-class SignatureInvalidException extends \Exception{
+class SignatureInvalidException extends FoundationException {
 
     private $authentication;
 

@@ -15,38 +15,28 @@ use Lcobucci\JWT\Token as JWTToken;
 use Lcobucci\JWT\Token\DataSet;
 use Lcobucci\JWT\Token\InvalidTokenStructure;
 use Lcobucci\JWT\Token\UnsupportedHeaderFound;
-use Lcobucci\JWT\Validation\Validator;
 use Tesoon\Foundation\Exceptions\TokenException;
 use Tesoon\Foundation\Exceptions\TokenVerifyException;
-use Tesoon\Foundation\Models\Data;
 
-abstract class Token extends GeneralObject implements Signature {
-    /**
-     * @var Application
-     */
-    public $application;
-
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-    }
+class Token extends GeneralObject implements Signature {
+    
+    const DATA = 'signature';
 
     /**
-     * 创建签名
-     * @param SignatureSetting $setting
-     * @return Authentication
-     * @throws TokenException
+     * @inheritDoc
      */
-    public function encrypt(SignatureSetting $setting): Authentication{
+    public function encrypt(Application $application, SignatureSetting $setting): Authentication{
         $authentication = new Authentication();
         $builder = new Builder(new Encoder());
         try{
-            $now = $this->getDateTimeImmutable();
+            $now = Helper::getDateTimeImmutable();
             $authentication->timestamp = $now->getTimestamp();
             $builder->issuedBy($setting->issuer)
                 ->issuedAt($now)
-                ->identifiedBy($this->getId($authentication->timestamp))
-                ->withClaim(Data::DATA, $setting->claims);
+                ->identifiedBy($this->getId($application, $authentication->timestamp));
+            foreach($setting->getClaims() as $name => $value){
+                $builder->withClaim($name, $value);
+            }
             if($setting->enableTime){
                 $builder->canOnlyBeUsedAfter($now->modify($setting->enableTime));
             }
@@ -56,7 +46,7 @@ abstract class Token extends GeneralObject implements Signature {
             foreach($setting->headers as $name => $value){
                 $builder->withHeader($name, $value);
             }
-            $authentication->signature = $builder->getToken($setting->signer ?? new Sha256(), InMemory::plainText(random_bytes(32), $this->application->key));
+            $authentication->signature = $builder->getToken($setting->signer ?? new Sha256(), InMemory::plainText(random_bytes(32), $application->key));
         }catch(Exception $e){
             throw new TokenException($e->getMessage(), $e->getCode(), $e);
         }
@@ -66,90 +56,42 @@ abstract class Token extends GeneralObject implements Signature {
     /**
      * @inheritDoc
      */
-    public function check(Authentication $authentication): bool{
+    public function decrypt(Authentication $authentication, Application $application): bool{
         try{
             $ticket = $authentication->signature;
             $token = $this->parseByTicket($ticket);
-            $validator = new Validator();
-            if($this->isExpired($token)){
-                throw new TokenVerifyException('令牌已过期');
+            $data = $token->claims()->get(static::DATA);
+            if($data instanceof \stdClass){
+                //stdClass convert array
+                $data = json_decode(json_encode($token->claims()->get(static::DATA)), true);
             }
-            if($this->isArrived($token)){
-                throw new TokenVerifyException('令牌未达到有效使用时间');
-            }
-            //stdClass convert array
-            $authentication->setBody(json_decode(json_encode($token->claims()->get(Data::DATA)), true));
+            $authentication->setBody($token, $data);
         }catch(Exception $e){
-            throw new TokenVerifyException($e->getMessage(), $e->getCode(), $e);
+            throw new TokenException($e->getMessage(), $e->getCode(), $e);
         }
         return true;
     }
 
-
     /**
-     * 如果失败返回false
-     * @param string $ticket
-     * @return DataSet
-     * @throws TokenVerifyException
+     * @param Application $application
+     * @param int $timestamp
+     * @return string
      */
-    protected function parse(string $ticket): DataSet{
-        try{
-            return $this->parseByTicket($ticket)->claims();
-        }catch(CannotDecodeContent | InvalidTokenStructure | UnsupportedHeaderFound $e){
-            throw new TokenVerifyException($e->getMessage(), $e->getCode(), $e);
-        }
+    public function getId(Application $application, int $timestamp): string{
+        return md5($application->key.$timestamp);
     }
-
-    private $token;
 
     /**
      * @param string $ticket
      * @return JWTToken
      * @throws TokenVerifyException
      */
-    public function parseByTicket(string $ticket): JWTToken{
-        if($this->token != null){
-            return $this->token;
-        }
+    private function parseByTicket(string $ticket): JWTToken{
         try{
-            return $this->token = (new Parser(new Decoder()))->parse($ticket);
+            return (new Parser(new Decoder()))->parse($ticket);
         }catch(CannotDecodeContent | InvalidTokenStructure | UnsupportedHeaderFound $e){
             throw new TokenVerifyException($e->getMessage(), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * @param int $timestamp
-     * @return string
-     */
-    protected abstract function getId(int $timestamp): string;
-
-    /**
-     * 是否过期
-     * @param JWTToken $token
-     * @return bool 如果已过期则为true
-     * @throws Exception
-     */
-    protected function isExpired(JWTToken $token): bool{
-        return $token->isExpired($this->getDateTimeImmutable());
-    }
-
-    /**
-     * 是否到达预设使用时间
-     * @param JWTToken $token
-     * @return bool 如果到达则为true
-     * @throws Exception
-     */
-    protected function isArrived(JWTToken $token): bool{
-        return !$token->isMinimumTimeBefore($this->getDateTimeImmutable());
-    }
-
-    /**
-     * @return DateTimeImmutable
-     * @throws Exception
-     */
-    private function getDateTimeImmutable(): DateTimeImmutable{
-        return new DateTimeImmutable('now', new DateTimeZone('Asia/Shanghai'));
     }
 
 }

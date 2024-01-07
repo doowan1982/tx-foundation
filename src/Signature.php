@@ -1,6 +1,7 @@
 <?php
 namespace Tesoon\Foundation;
 
+use Tesoon\Foundation\Exceptions\TokenException;
 use Tesoon\Foundation\Exceptions\TokenVerifyException;
 
 /**
@@ -12,18 +13,28 @@ interface Signature{
 
     /**
      * 计算签名
-     * @parma SignatureSetting $setting
+     * @param Application $application
+     * @param SignatureSetting $setting
      * @return Authentication
-     * @throw TokenException
+     * @throws TokenException
      */
-    public function encrypt(SignatureSetting $setting): Authentication;
+    public function encrypt(Application $application, SignatureSetting $setting): Authentication;
 
     /**
      * 检查指定authentication是否有效
      * @param Authentication $authentication
+     * @param Application $application
      * @return bool
-     * @throws TokenVerifyException
+     * @throws TokenException
      */
-    public function check(Authentication $authentication): bool;
+    public function decrypt(Authentication $authentication, Application $application): bool;
+
+    /**
+     * 生成jti唯一标识
+     * @param Application $application
+     * @param int $timestamp
+     * @return string
+     */
+    public function getId(Application $application, int $timestamp): string;
 
 }

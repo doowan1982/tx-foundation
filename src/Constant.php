@@ -42,4 +42,12 @@ class Constant{
      */
     const ORGANIZATION_PUSH_TYPE = 8;
 
+
+    const GET_REQUEST = 'GET';
+    const POST_REQUEST = 'POST';
+    const PUT_REQUEST = 'PUT';
+    const DELETE_REQUEST = 'DELETE';
+
+    const RESPONSE_CODE_OK = 20000;
+
 }

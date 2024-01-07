@@ -16,11 +16,6 @@ class SignatureSetting extends GeneralObject
     /**
      * @var array
      */
-    public $claims = [];
-
-    /**
-     * @var array
-     */
     public $headers = [];
 
     /**
@@ -38,5 +33,24 @@ class SignatureSetting extends GeneralObject
      * @var Signer
      */
     public $signer; 
+
+    /**
+     * @var array
+     */
+    private $claims;
+
+    public function setSignature(string $signature): SignatureSetting{
+        $this->setClaim(Token::DATA, $signature);
+        return $this;
+    }
+
+    public function setClaim(string $name, $value): SignatureSetting{
+        $this->claims[$name] = $value;
+        return $this;
+    }
+
+    public function getClaims(): array{
+        return $this->claims;
+    }
 
 }

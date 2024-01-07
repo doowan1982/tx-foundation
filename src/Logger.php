@@ -10,12 +10,6 @@ class Logger{
 
     private $message = [];
 
-    private $class;
-
-    public function __construct(string $class){
-        $this->class = $class;
-    }
-    
     public function debug(string $message, array $config = []){
         $this->message[static::DEBUG][] = $message;
     }

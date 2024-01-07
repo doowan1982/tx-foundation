@@ -10,9 +10,7 @@ use Tesoon\Foundation\Exceptions\DataException;
  * 对于该子类的的实现构造方法的参数需为无参或者具有默认值的参数
  */
 abstract class Data{
-
-    const DATA = 'data';
-
+    
     /**
      * @param array|string $data
      * @return Data
@@ -30,6 +28,7 @@ abstract class Data{
     /**
      * @param string $key
      * @param mixed $value
+     * @throws DataException
      */
     public function setValue(string $key, $value){
         if($this->$key instanceof Lists){

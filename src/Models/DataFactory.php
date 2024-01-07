@@ -61,7 +61,14 @@ class DataFactory
                 return EnterpriseOrganization::create($data);
             }
         }
-        throw new DataException(DataFactory::class, null, "未匹配到有效的数据类型");
+        if(!empty($data['object'])){
+            //序列化型参数
+            $obj = unserialize($data['object']);
+            if(is_object($obj)){
+                return $obj;
+            }
+        }
+        return EmptyData::create();
     }
 
 }

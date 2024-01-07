@@ -8,12 +8,15 @@ use Tesoon\Foundation\Authentication;
 use Tesoon\Foundation\Constant;
 use Tesoon\Foundation\Exceptions\DataException;
 use Tesoon\Foundation\Exceptions\SignatureInvalidException;
+use Tesoon\Foundation\Exceptions\TokenException;
+use Tesoon\Foundation\Helper;
 use Tesoon\Foundation\Models\DataFactory;
 use Tesoon\Foundation\Models\EnterpriseOrganization;
 use Tesoon\Foundation\Models\Lists;
-use Tesoon\Foundation\Response\Reach;
-use Tesoon\Foundation\Response\Signature;
+use Tesoon\Foundation\DefaultSignature as Signature;
+use Tesoon\Foundation\Decoder;
 use Tesoon\Foundation\SignatureSetting;
+use Tesoon\Foundation\Token;
 
 /**
  * @group reach
@@ -21,18 +24,15 @@ use Tesoon\Foundation\SignatureSetting;
 class ReachTest extends TestCase{
 
     public function testToken(){
-        $application = $this->getApplication();
-        $token = new Signature($application);
+        $token = new Token();
         $setting = new SignatureSetting();
-        $setting->claims = ['a' => ['c' => 'aaaaa']];
+        $setting->setSignature(Helper::computeMD5(['a' => ['c' => 'aaaaa']]));
         $setting->expiredTime = '+2 seconds';
         $authentication = null;
         try{
-            $authentication = $token->encrypt($setting);
+            $authentication = $token->encrypt($this->getApplication(), $setting);
             // echo $authentication->signature;exit;
-            $this->assertTrue($token->check($authentication), '验证失败');
-            $body = $authentication->getBody();
-            $this->assertTrue(isset($body['a']), '解析ticket数据失败');
+            $this->assertTrue($token->decrypt($authentication, $this->getApplication()), '验证失败');
         }catch(\Exception $e){
             throw $e;
         }
@@ -41,16 +41,17 @@ class ReachTest extends TestCase{
     /**
      * @group reachEnter
      */
-    public function testGenereateTicket(){
-        $token = new Signature($this->getApplication());
+    public function testGenerateTicket(){
+        $token = new Token();
         $setting = new SignatureSetting();
         $setting->signer = new Sha512();
-        $setting->claims = [ 
+        $setting->expiredTime = '+2 day';
+        $setting->setSignature(Helper::computeMD5([ 
             'content' => $this->getTestJSON('admin.json'),
             'type' => Constant::ADMIN_PUSH_TYPE
-        ];
+        ]));
         try{
-            $authentication = $token->encrypt($setting);
+            $authentication = $token->encrypt($this->getApplication(), $setting);
             file_put_contents('./tests/data/ticket.txt', $authentication->signature);
             $this->assertTrue(true, 'Required');
             return $authentication->signature;
@@ -61,20 +62,24 @@ class ReachTest extends TestCase{
 
     /**
      * @group reachEnter
-     * @depends testGenereateTicket
+     * @depends testGenerateTicket
      */
     public function testReach($ticket){
         $authentication = new Authentication();
         $authentication->signature = $ticket;
         $application = $this->getApplication();
-        $reach = new Reach($application, new Signature($application));
+        $reach = new Decoder($application, new Token());
+        $parameters = [ 
+            'type' => Constant::ADMIN_PUSH_TYPE,
+            'content' => $this->getTestJSON('admin.json'),
+        ];
         try{
-            $data = $reach->get($authentication);
+            $data = $reach->get($authentication, null, $parameters)->getData();
             $this->assertNotNull($data, '获取无效的Data');
             $this->assertTrue($data instanceof Lists, '获取管理员数据失败');
             $body = $authentication->getBody();
-            $this->assertAdminTest($data, $body['content']);
-        }catch(SignatureInvalidException $e){
+            $this->assertAdminTest($data, $parameters['content']);
+        }catch(SignatureInvalidException|DataException|TokenException $e){
             throw $e;
         }
     }
@@ -83,15 +88,15 @@ class ReachTest extends TestCase{
      * @group fetchResponseData
      */
     public function testFetchResponseData(){
-        $token = new Signature($this->getApplication());
+        $token = new Token();
         $setting = new SignatureSetting();
-        $setting->claims = $this->getTestJSON('admin.json');
+        $data = $this->getTestJSON('admin.json');
+        $setting->setSignature(Helper::computeMD5($data));
         try{
-            $authentication = $token->encrypt($setting);
+            $authentication = $token->encrypt($this->getApplication(), $setting);
             // echo $authentication->signature;exit;
-            $this->assertTrue($token->check($authentication), '验证失败');
-            $this->assertTrue(is_array($authentication->getBody()), '解析ticket数据失败');
-            return $authentication->getBody();
+            $this->assertTrue($token->decrypt($authentication,$this->getApplication()), '验证失败');
+            return $data;
         }catch(\Exception $e){
             throw $e;
         }

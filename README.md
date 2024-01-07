@@ -12,7 +12,7 @@
     tests/:
         .\vendor\bin\phpunit --testdox-html ./tests/index.html --log-junit ./tests/test.xml --colors=always  -v  .\tests\
 
-### Response/Reach使用示例：
+### Decoder使用示例：
 ```php
     /**
      * 根据ticket内容来返回对应的Data子类（Tesoon\Foundation\Models\*）
@@ -21,14 +21,19 @@
     function parse(string $ticket): ?Data{
         $authentication = new Authentication();
         $authentication->signature = $ticket;
-        $application = new Application('应用id', '应用key');
-        $reach = new Reach($application, new Signature($application));
+        $application = $this->getApplication();
+        $decoder = new Decoder($application, new Token());
+        //以下参数为：$_GET+$_POST
+        $parameters = [ 
+            'type' => Constant::ADMIN_PUSH_TYPE,
+            'content' => '',
+            //....
+        ];
         try{
-            return $reach->get($authentication);
-        }catch(SignatureInvalidException $e){
+            return $decoder->get($authentication, null, $parameters)->getData();
+        }catch(SignatureInvalidException|DataException|TokenException $e){
             throw $e;
         }
         return null;
     }
-    
 ```

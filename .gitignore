@@ -1,4 +1,4 @@
 /vendor/
-/tests/test.xml
-/tests/index.html
+/tests/data/*
 composer.lock
+.idea/*

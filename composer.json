@@ -19,6 +19,7 @@
         "phpunit/phpunit": "8.5"
     },
     "require": {
-        "lcobucci/jwt": "3.4.6"
+        "lcobucci/jwt": "3.4.6",
+        "guzzlehttp/guzzle": "7.8.0"
     }
 }
