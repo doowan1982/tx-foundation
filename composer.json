@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "lcobucci/jwt": "v3.4.*",
-        "guzzlehttp/guzzle": "~6.2"
+        "guzzlehttp/guzzle": "~6.2",
+        "lcobucci/jwt": "3.4.*"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.0"
