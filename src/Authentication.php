@@ -9,7 +9,9 @@ use Lcobucci\JWT\Token;
 class Authentication extends GeneralObject{
 
     /**
+     * encrypt之后的签名字符串
      * @var string
+     * @see \Tesoon\Foundation\Token encrypt()
      */
     public $signature = '';
 

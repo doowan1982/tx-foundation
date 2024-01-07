@@ -54,7 +54,7 @@ class ReachTest extends TestCase{
             $authentication = $token->encrypt($this->getApplication(), $setting);
             file_put_contents('./tests/data/ticket.txt', $authentication->signature);
             $this->assertTrue(true, 'Required');
-            return $authentication->signature;
+            return $authentication;
         }catch(\Exception $e){
             throw $e;
         }
@@ -64,12 +64,10 @@ class ReachTest extends TestCase{
      * @group reachEnter
      * @depends testGenerateTicket
      */
-    public function testReach($ticket){
-        $authentication = new Authentication();
-        $authentication->signature = $ticket;
+    public function testReach($authentication){
         $application = $this->getApplication();
         $reach = new Decoder($application, new Token());
-        $parameters = [ 
+        $parameters = [
             'type' => Constant::ADMIN_PUSH_TYPE,
             'content' => $this->getTestJSON('admin.json'),
         ];

@@ -44,6 +44,9 @@ class Decoder{
         if($signature !== Helper::computeMD5($responseParameters)){
             throw new SignatureInvalidException($authentication, '数据校验失败');
         }
+
+        $this->check($authentication, $outer);
+
         $responseBody = $this->getResponseBody();
         $responseBody->setResponseParameters($responseParameters);
         return $responseBody;
@@ -57,7 +60,7 @@ class Decoder{
      * @throws TokenVerifyException
      */
     protected function check(Authentication $authentication, Application $application): bool{
-        if(!$this->isValid($authentication, $application)){
+        if($this->isValid($authentication, $application)){
             throw new TokenVerifyException('无效的令牌');
         }
         if($this->isExpired($authentication)){
