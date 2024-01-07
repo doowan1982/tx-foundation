@@ -40,7 +40,7 @@ class Decoder{
         if(!$this->signature->decrypt($authentication, $outer)){
             throw new SignatureInvalidException($authentication, '验证失败');
         }
-        $signature = $authentication->getBody();
+        $signature = $authentication->getBody(Token::SIGNATURE);
         if($signature !== Helper::computeMD5($responseParameters)){
             throw new SignatureInvalidException($authentication, '数据校验失败');
         }

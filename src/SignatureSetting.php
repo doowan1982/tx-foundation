@@ -40,7 +40,7 @@ class SignatureSetting extends GeneralObject
     private $claims;
 
     public function setSignature(string $signature): SignatureSetting{
-        $this->setClaim(Token::DATA, $signature);
+        $this->setClaim(Token::SIGNATURE, $signature);
         return $this;
     }
 

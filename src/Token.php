@@ -19,8 +19,9 @@ use Tesoon\Foundation\Exceptions\TokenException;
 use Tesoon\Foundation\Exceptions\TokenVerifyException;
 
 class Token extends GeneralObject implements Signature {
-    
-    const DATA = 'signature';
+
+    const DATA = 'data';
+    const SIGNATURE = 'signature';
 
     /**
      * @inheritDoc
@@ -33,10 +34,8 @@ class Token extends GeneralObject implements Signature {
             $authentication->timestamp = $now->getTimestamp();
             $builder->issuedBy($setting->issuer)
                 ->issuedAt($now)
-                ->identifiedBy($this->getId($application, $authentication->timestamp));
-            foreach($setting->getClaims() as $name => $value){
-                $builder->withClaim($name, $value);
-            }
+                ->identifiedBy($this->getId($application, $authentication->timestamp))
+                ->withClaim(static::DATA, $setting->getClaims());
             if($setting->enableTime){
                 $builder->canOnlyBeUsedAfter($now->modify($setting->enableTime));
             }
@@ -58,14 +57,7 @@ class Token extends GeneralObject implements Signature {
      */
     public function decrypt(Authentication $authentication, Application $application): bool{
         try{
-            $ticket = $authentication->signature;
-            $token = $this->parseByTicket($ticket);
-            $data = $token->claims()->get(static::DATA);
-            if($data instanceof \stdClass){
-                //stdClass convert array
-                $data = json_decode(json_encode($token->claims()->get(static::DATA)), true);
-            }
-            $authentication->setBody($token, $data);
+            $authentication->setToken($this->parseByTicket($authentication->signature));
         }catch(Exception $e){
             throw new TokenException($e->getMessage(), $e->getCode(), $e);
         }
