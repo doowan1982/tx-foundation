@@ -6,7 +6,7 @@ abstract class GeneralObject{
     /**
      * @return Logger
      */
-    public function logger(): Logger{
+    public static function logger(): Logger{
         return LoggerFactory::logger();
     }
 

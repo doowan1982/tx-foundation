@@ -75,7 +75,6 @@ class ReachTest extends TestCase{
             $data = $reach->get($authentication, null, $parameters)->getData();
             $this->assertNotNull($data, '获取无效的Data');
             $this->assertTrue($data instanceof Lists, '获取管理员数据失败');
-            $body = $authentication->getBody();
             $this->assertAdminTest($data, $parameters['content']);
         }catch(SignatureInvalidException|DataException|TokenException $e){
             throw $e;
