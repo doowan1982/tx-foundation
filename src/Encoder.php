@@ -26,18 +26,24 @@ class Encoder{
 
     /**
      * @param array $data
-     * @param Application|null $outer
+     * @param SignatureSetting|null $setting
+     * @param Application|null $outer 外部应用，如果未指定该参数则将使用$this->application来进行加密
      * @return string
      * @throws TokenException
      */
-    public function encrypt(array $data, Application $outer = null): string{
+    public function encrypt(array $data, SignatureSetting $setting = null, Application $outer = null): string{
         if($outer === null){
             $outer = $this->application;
         }
-        $setting = new SignatureSetting();
+        if($setting === null){
+            $setting = new SignatureSetting();
+        }
         $setting->setSignature(Helper::computeMD5($data));
-        $setting->setClaim('application_id', $outer->id);
         return $this->signature->encrypt($outer, $setting)->signature;
+    }
+
+    public function getApplication():Application{
+        return $this->application;
     }
 
 }
