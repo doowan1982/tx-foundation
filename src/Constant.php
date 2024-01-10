@@ -42,6 +42,11 @@ class Constant{
      */
     const ORGANIZATION_PUSH_TYPE = 8;
 
+    /**
+     * 登录信息
+     */
+    const LOGIN_PUSH_TYPE = 9;
+
 
     const GET_REQUEST = 'GET';
     const POST_REQUEST = 'POST';

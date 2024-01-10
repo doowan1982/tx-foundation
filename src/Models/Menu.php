@@ -3,6 +3,8 @@
 
 namespace Tesoon\Foundation\Models;
 
+use Tesoon\Foundation\Helper;
+
 /**
  * 菜单数据
  * Class Menu
@@ -48,7 +50,7 @@ class Menu extends Data
         $list = new Lists();
         foreach($data as $value){
             $menu = new Menu();
-            static::setObjectValues($menu, $value);
+            Helper::setObjectValues($menu, $value);
             if($value['type'] > 1){
                 $menu->type = Menu::MENU;
             }

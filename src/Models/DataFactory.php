@@ -60,6 +60,10 @@ class DataFactory
             case Constant::ORGANIZATION_PUSH_TYPE : {
                 return EnterpriseOrganization::create($data);
             }
+            break;
+            case Constant::LOGIN_PUSH_TYPE: {
+                return LoginInfo::create($data);
+            }
         }
         if(!empty($data['object'])){
             //序列化型参数

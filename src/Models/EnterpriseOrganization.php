@@ -2,6 +2,7 @@
 namespace Tesoon\Foundation\Models;
 
 use Tesoon\Foundation\Exceptions\DataException;
+use Tesoon\Foundation\Helper;
 
 class EnterpriseOrganization extends Data{
 
@@ -64,11 +65,14 @@ class EnterpriseOrganization extends Data{
         ];
     }
 
+    /**
+     * @inheritDoc
+     */
     public static function create($data): Data{
         $list = new Lists();
         foreach($data as $value){
             $obj = new static();
-            static::setObjectValues($obj, $value);
+            Helper::setObjectValues($obj, $value);
             $list->add($obj);
         }
         static::organize($list);

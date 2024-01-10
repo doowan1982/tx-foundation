@@ -1,7 +1,10 @@
 <?php
 namespace Tesoon\Tests;
 
+use Monolog\Handler\StreamHandler;
 use PHPUnit\Framework\TestCase;
+use Tesoon\Foundation\GeneralObject;
+use Tesoon\Foundation\Helper;
 use Tesoon\Foundation\Models\Categories\Subject;
 use Tesoon\Foundation\Models\Data;
 use Tesoon\Foundation\Models\Categories\Job;
@@ -12,7 +15,6 @@ use Tesoon\Foundation\Models\Lists;
  */
 class DataTest extends TestCase{
 
-
     public function testSetObjectValues(){
         $subject = new Subject();
         $data = [
@@ -20,7 +22,7 @@ class DataTest extends TestCase{
             "unique_name" => "XK00002",
             "subject_id" => 88
         ];
-        Data::setObjectValues($subject, $data);
+        Helper::setObjectValues($subject, $data);
         $this->assertTrue($subject->id == $data['subject_id'], '设置subject_id失败');
         $this->assertTrue($subject->name == $data['subject_name'], '设置subject_name失败');
         $this->assertTrue($subject->uniqueName == $data['unique_name'], '设置unique_name失败');

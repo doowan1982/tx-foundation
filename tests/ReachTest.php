@@ -2,19 +2,26 @@
 namespace Tesoon\Tests;
 
 use Lcobucci\JWT\Signer\Hmac\Sha512;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Tesoon\Foundation\Application;
 use Tesoon\Foundation\Authentication;
 use Tesoon\Foundation\Constant;
+use Tesoon\Foundation\Context;
 use Tesoon\Foundation\Exceptions\DataException;
 use Tesoon\Foundation\Exceptions\SignatureInvalidException;
 use Tesoon\Foundation\Exceptions\TokenException;
+use Tesoon\Foundation\GeneralObject;
 use Tesoon\Foundation\Helper;
+use Tesoon\Foundation\Logstash\LogConfig;
+use Tesoon\Foundation\Models\ApplicationKey;
 use Tesoon\Foundation\Models\DataFactory;
 use Tesoon\Foundation\Models\EnterpriseOrganization;
 use Tesoon\Foundation\Models\Lists;
 use Tesoon\Foundation\DefaultSignature as Signature;
 use Tesoon\Foundation\Decoder;
+use Tesoon\Foundation\Models\LoginInfo;
 use Tesoon\Foundation\SignatureSetting;
 use Tesoon\Foundation\Token;
 
@@ -23,6 +30,14 @@ use Tesoon\Foundation\Token;
  */
 class ReachTest extends TestCase{
 
+    public static function setUpBeforeClass(): void
+    {
+        $config = new LogConfig();
+        $config->handlers = [new StreamHandler('./tests/data/log/logger.log', Logger::DEBUG)];
+        Context::instance()
+            ->setApplication(static::getApplication())
+            ->setLogConfig($config);
+    }
     public function testToken(){
         $token = new Token();
         $setting = new SignatureSetting();
@@ -30,9 +45,9 @@ class ReachTest extends TestCase{
         $setting->expiredTime = '+2 seconds';
         $authentication = null;
         try{
-            $authentication = $token->encrypt($this->getApplication(), $setting);
+            $authentication = $token->encrypt(static::getApplication(), $setting);
             // echo $authentication->signature;exit;
-            $this->assertTrue($token->decrypt($authentication, $this->getApplication()), '验证失败');
+            $this->assertTrue($token->decrypt($authentication, static::getApplication()), '验证失败');
         }catch(\Exception $e){
             throw $e;
         }
@@ -51,7 +66,7 @@ class ReachTest extends TestCase{
             'type' => Constant::ADMIN_PUSH_TYPE
         ]));
         try{
-            $authentication = $token->encrypt($this->getApplication(), $setting);
+            $authentication = $token->encrypt(static::getApplication(), $setting);
             file_put_contents('./tests/data/ticket.txt', $authentication->signature);
             $this->assertTrue(true, 'Required');
             return $authentication;
@@ -64,8 +79,8 @@ class ReachTest extends TestCase{
      * @group reachEnter
      * @depends testGenerateTicket
      */
-    public function testReach($authentication){
-        $application = $this->getApplication();
+    public function testReach(Authentication $authentication){
+        $application = static::getApplication();
         $reach = new Decoder($application, new Token());
         $parameters = [
             'type' => Constant::ADMIN_PUSH_TYPE,
@@ -82,6 +97,18 @@ class ReachTest extends TestCase{
     }
 
     /**
+     * @depends testGenerateTicket
+     */
+    public function testContextResponse(Authentication $authentication){
+        $body = Context::instance()->getResponse($authentication->signature, [
+            'content' => $this->getTestJSON('admin.json'),
+            'type' => Constant::ADMIN_PUSH_TYPE
+        ]);
+        $this->assertIsObject($body->getData(), '请求失败');
+    }
+
+
+    /**
      * @group fetchResponseData
      */
     public function testFetchResponseData(){
@@ -90,9 +117,9 @@ class ReachTest extends TestCase{
         $data = $this->getTestJSON('admin.json');
         $setting->setSignature(Helper::computeMD5($data));
         try{
-            $authentication = $token->encrypt($this->getApplication(), $setting);
+            $authentication = $token->encrypt(static::getApplication(), $setting);
             // echo $authentication->signature;exit;
-            $this->assertTrue($token->decrypt($authentication,$this->getApplication()), '验证失败');
+            $this->assertTrue($token->decrypt($authentication,static::getApplication()), '验证失败');
             return $data;
         }catch(\Exception $e){
             throw $e;
@@ -171,6 +198,29 @@ class ReachTest extends TestCase{
          $this->assertTrue($root->getAllEnterpriseOrganization()->size() == count($array) - 1, '组织架构未包含所有子节点');
      }
 
+     public function testLoginInfo(){
+         $array = $this->getTestJSON('login-info.json');
+         /**
+         * @var LoginInfo
+         */
+         $loginInfo = DataFactory::build(Constant::LOGIN_PUSH_TYPE, $array);
+         $this->assertTrue($loginInfo->adminId === $array['admin_id'], '管理员ID不正确');
+         $this->assertTrue($loginInfo->employeeId === $array['employee_id'], '员工ID不正确');
+         $admin = $loginInfo->pullAdmin([]);
+
+    }
+
+
+     public function testKey(){
+        $array = [
+            'type' => ApplicationKey::APPLICATION_TYPE,
+            'key' => 'asfasfsdsdf'
+        ];
+        $key = DataFactory::build(Constant::KEY_PUSH_TYPE, $array);
+        $this->assertTrue($key->type === ApplicationKey::APPLICATION_TYPE, 'Key类型不正确');
+     }
+
+
      private function assertAdminTest(Lists $admins, array $array){
         foreach($admins as $k=>$admin){
             $data = $array[$k];
@@ -195,15 +245,15 @@ class ReachTest extends TestCase{
      private function getTestJSON(string $file){
          $content = file_get_contents('./tests/data/'.$file);
          $array = json_decode($content, true); 
-         return $array['content'] ?? [];
+         return $array['content'] ?? $array;
      }
 
-    private $application;
-    private function getApplication(): Application{
-        if($this->application === null){
-            $this->application = new Application('test', 'this is key!');
+    private static $application;
+    private static function getApplication(): Application{
+        if(static::$application === null){
+            static::$application = new Application('test', 'this is key!');
         }
-        return $this->application;
+        return static::$application;
     }
 
 }
