@@ -55,6 +55,8 @@ class Transport extends GeneralObject
 
     private $rejected;
 
+    private $setting;
+
     public function __construct(Encoder $encoder = null)
     {
         $this->encoder = $encoder;
@@ -97,6 +99,11 @@ class Transport extends GeneralObject
      */
     public function getParameters(): array{
         return $this->parameters;
+    }
+
+    public function setSignatureSetting(SignatureSetting $setting): Transport{
+        $this->setting = $setting;
+        return $this;
     }
 
     /**
@@ -161,9 +168,11 @@ class Transport extends GeneralObject
         }
 
         if($this->encoder){
-            $setting = new SignatureSetting();
-            $setting->setClaim('application_id', $this->encoder->getApplication()->id);
-            $headers[static::AUTHENTICATION] = $this->encoder->encrypt($json + $query, $setting);
+            if($this->setting === null){
+                $this->setting = new SignatureSetting();
+            }
+            $this->setting->setClaim('application_id', $this->encoder->getApplication()->id);
+            $headers[static::AUTHENTICATION] = $this->encoder->encrypt($json + $query, $this->setting);
         }
         static::logger()->notice('创建请求体', [
             'application_id' => $this->encoder->getApplication()->id,

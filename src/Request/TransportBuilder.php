@@ -8,6 +8,7 @@ use Tesoon\Foundation\Header;
 use Tesoon\Foundation\Models\Admin;
 use Tesoon\Foundation\Models\Lists;
 use Tesoon\Foundation\Request\Transports\Admin as AdminTransport;
+use Tesoon\Foundation\SignatureSetting;
 
 /**
  * 请求Builder，对服务端相关接口调用
@@ -20,6 +21,11 @@ final class TransportBuilder extends \Tesoon\Foundation\GeneralObject
 
     private $host = '';
 
+    /**
+     * @var SignatureSetting
+     */
+    private $setting;
+
     private static $instance;
 
     public static function create(): TransportBuilder{
@@ -27,6 +33,10 @@ final class TransportBuilder extends \Tesoon\Foundation\GeneralObject
             static::$instance = new self();
         }
         return static::$instance;
+    }
+
+    public function setSetting(SignatureSetting $setting){
+        $this->setting = $setting;
     }
 
     public function setEncoder(Encoder $encoder): TransportBuilder{
@@ -67,6 +77,7 @@ final class TransportBuilder extends \Tesoon\Foundation\GeneralObject
             ->getData();
     }
 
+
     /**
      * @param Transport $transport
      * @return Transport
@@ -76,8 +87,12 @@ final class TransportBuilder extends \Tesoon\Foundation\GeneralObject
         if($this->encoder === null){
             throw new FoundationException('请指定Encoder实例', 50000);
         }
+        if($this->setting === null){
+            $this->setting = new SignatureSetting();
+        }
         return $transport->setProtocol($this->protocol)
                 ->setHost($this->host)
+                ->setSignatureSetting($this->setting)
                 ->setParameter(Header::create('accept=application/json'));
     }
 
