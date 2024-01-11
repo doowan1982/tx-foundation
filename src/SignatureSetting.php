@@ -21,7 +21,7 @@ class SignatureSetting extends GeneralObject
     /**
      * @var string
      */
-    public $expiredTime = '+2 seconds';
+    public $expiredTime = '+60 seconds';
 
     /**
      * 签名的启用时间，默认为当前时间

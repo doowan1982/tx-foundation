@@ -54,6 +54,12 @@ class DataFactory
             }
             break;
             case Constant::KEY_PUSH_TYPE : {
+                if(is_string($data)){ //兼容前期仅推送中台密钥
+                    $data = [
+                        'type' => ApplicationKey::APPLICATION_TYPE,
+                        'key' => $data
+                    ];
+                }
                 return ApplicationKey::create($data);
             }
             break;

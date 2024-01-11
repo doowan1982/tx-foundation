@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Tesoon\Foundation\Application;
 use Tesoon\Foundation\Context;
 use Tesoon\Foundation\Logstash\LogConfig;
+use Tesoon\Foundation\SignatureSetting;
 
 /**
  * @group transport
@@ -17,8 +18,13 @@ class TransportTest extends TestCase{
     {
         $config = new LogConfig();
         $config->handlers = [new StreamHandler('./tests/data/log/logger.log', Logger::DEBUG)];
+
+        $setting = new SignatureSetting();
+        $setting->expiredTime = '+2 day';
         Context::instance()->setLogConfig($config)
-                ->setApplication(new Application('9276597406', 'f2d09915fc4dee4b3ee6d97e5a6ea5b8'));
+                ->setApplication(new Application('9276597406', 'f2d09915fc4dee4b3ee6d97e5a6ea5b8'))
+                ->getRequest()
+                ->setSetting($setting);
     }
 
     /**

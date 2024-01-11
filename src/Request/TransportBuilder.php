@@ -35,8 +35,9 @@ final class TransportBuilder extends \Tesoon\Foundation\GeneralObject
         return static::$instance;
     }
 
-    public function setSetting(SignatureSetting $setting){
+    public function setSetting(SignatureSetting $setting): TransportBuilder{
         $this->setting = $setting;
+        return $this;
     }
 
     public function setEncoder(Encoder $encoder): TransportBuilder{

@@ -10,20 +10,21 @@ class Helper{
 
     /**
      * 计算数组的MD5
+     * @param array $parameters
      * @return string
      */
     public static function computeMD5(array $parameters): string{
-        $string = '';
+        $strings = [];
         ksort($parameters);
         foreach($parameters as $name=>$parameter){
             if(!is_array($parameter)){
-                $string .= "{$name}={$parameter}";
+                $strings[] = "{$name}={$parameter}";
             }else{
                 //此处防止字符过长存在的内存占用问题
-                $string = md5($string.static::computeMD5($parameter));
+                $strings[] = md5(static::computeMD5($parameter));
             }
         }
-        return md5($string);
+        return md5(implode('', $strings));
     }
 
     /**
@@ -38,9 +39,10 @@ class Helper{
      * 将给定的$data绑定到$object中
      * @param Data $object
      * @param mixed $data
+     * @return Data
      * @throws \ReflectionException
      */
-    public static function setObjectValues(Data $object, $data){
+    public static function setObjectValues(Data $object, $data): Data{
         $reflectionClass = new \ReflectionClass($object);
         $mapper = $object->maps();
         if($data instanceof stdClass){
@@ -67,6 +69,7 @@ class Helper{
         }else{
             throw new DataException(static::class, $data, "仅支持数组动态赋值");
         }
+        return $object;
     }
 
     private static function convertCamelCase(string $str): string{

@@ -147,7 +147,6 @@ class Transport extends GeneralObject
         }catch(GuzzleException|DataException $e){
             throw new RequestException($this, $e->getCode(), $e);
         }
-        return $responseBody;
     }
 
     /**

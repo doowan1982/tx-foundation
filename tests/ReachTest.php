@@ -15,6 +15,7 @@ use Tesoon\Foundation\Exceptions\TokenException;
 use Tesoon\Foundation\GeneralObject;
 use Tesoon\Foundation\Helper;
 use Tesoon\Foundation\Logstash\LogConfig;
+use Tesoon\Foundation\Models\Admin;
 use Tesoon\Foundation\Models\ApplicationKey;
 use Tesoon\Foundation\Models\DataFactory;
 use Tesoon\Foundation\Models\EnterpriseOrganization;
@@ -33,16 +34,22 @@ class ReachTest extends TestCase{
     public static function setUpBeforeClass(): void
     {
         $config = new LogConfig();
+        $setting = new SignatureSetting();
+        $setting->expiredTime = '+2 hours';
         $config->handlers = [new StreamHandler('./tests/data/log/logger.log', Logger::DEBUG)];
         Context::instance()
             ->setApplication(static::getApplication())
-            ->setLogConfig($config);
+            ->setLogConfig($config)
+            ->getRequest()
+            ->setSetting($setting)
+            ->setRequestContext('foundation.lts.tesoon.com');
+//            ->setRequestContext('f-dev.tesoon.com', 'http');
     }
     public function testToken(){
         $token = new Token();
         $setting = new SignatureSetting();
         $setting->setSignature(Helper::computeMD5(['a' => ['c' => 'aaaaa']]));
-        $setting->expiredTime = '+2 seconds';
+        $setting->expiredTime = '+2 day';
         $authentication = null;
         try{
             $authentication = $token->encrypt(static::getApplication(), $setting);
@@ -198,6 +205,9 @@ class ReachTest extends TestCase{
          $this->assertTrue($root->getAllEnterpriseOrganization()->size() == count($array) - 1, '组织架构未包含所有子节点');
      }
 
+    /**
+     * @group loginInfo
+     */
      public function testLoginInfo(){
          $array = $this->getTestJSON('login-info.json');
          /**
@@ -207,6 +217,7 @@ class ReachTest extends TestCase{
          $this->assertTrue($loginInfo->adminId === $array['admin_id'], '管理员ID不正确');
          $this->assertTrue($loginInfo->employeeId === $array['employee_id'], '员工ID不正确');
          $admin = $loginInfo->pullAdmin([]);
+         $this->assertEquals($admin instanceof Admin, '登录后拉取管理数据失败');
 
     }
 
@@ -251,7 +262,7 @@ class ReachTest extends TestCase{
     private static $application;
     private static function getApplication(): Application{
         if(static::$application === null){
-            static::$application = new Application('test', 'this is key!');
+            static::$application = new Application('9276597406', 'f2d09915fc4dee4b3ee6d97e5a6ea5b8');
         }
         return static::$application;
     }
