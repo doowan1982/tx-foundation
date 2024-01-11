@@ -26,7 +26,7 @@ Context::instance()->setLogConfig($config) //如果未进行该设置，将无�
 
 ```php
 $data = Context::instance()->getRequest()
-    			->setRequestDomain('targe_url', 'http')
+    			->setRequestDomain('target_url', 'http')
     			->getAdmin(244282);
  //目前对于Request仅支持管理员数据查询，后期将按需新增其他的接口操作
 ```
