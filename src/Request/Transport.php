@@ -159,10 +159,10 @@ class Transport extends GeneralObject
         foreach($this->parameters as $parameter){
             if($parameter instanceof Header) {
                 $headers[$parameter->getName()] = $parameter->getValue();
-            }else if($parameter instanceof Parameter){
-                $json[$parameter->getName()] = $parameter->getValue();
             }else if($parameter instanceof QueryParameter){
                 $query[$parameter->getName()] = $parameter->getValue();
+            }else if($parameter instanceof Parameter){
+                $json[$parameter->getName()] = $parameter->getValue();
             }
         }
 
@@ -174,7 +174,7 @@ class Transport extends GeneralObject
             $headers[static::AUTHENTICATION] = $this->encoder->encrypt($json + $query, $this->setting);
         }
         static::logger()->notice('创建请求体', [
-            'application_id' => $this->encoder->getApplication()->id,
+            'application_id' => $this->encoder ? $this->encoder->getApplication()->id : 0,
             'url' => "{$this->protocol}://{$this->host}/{$this->uri}",
             'header' => $headers,
             'json' => $json,
