@@ -18,6 +18,9 @@ class Helper{
         ksort($parameters);
         foreach($parameters as $name=>$parameter){
             if(!is_array($parameter)){
+                if(is_numeric($parameter) || is_bool($parameter)){
+                    $parameter = (string)$parameter;
+                }
                 $strings[] = "{$name}={$parameter}";
             }else{
                 //此处防止字符过长存在的内存占用问题
