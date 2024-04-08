@@ -170,7 +170,7 @@ class Transport extends GeneralObject
             if($this->setting === null){
                 $this->setting = new SignatureSetting();
             }
-            $this->setting->setClaim('application_id', $this->encoder->getApplication()->id);
+            $this->setting->setClaim(Constant::APPLICATION_NAME, $this->encoder->getApplication()->id);
             $headers[static::AUTHENTICATION] = $this->encoder->encrypt($json + $query, $this->setting);
         }
         static::logger()->notice('创建请求体', [

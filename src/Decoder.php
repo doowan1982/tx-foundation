@@ -38,11 +38,11 @@ class Decoder{
             $outer = $this->application;
         }
         if(!$this->signature->decrypt($authentication, $outer)){
-            throw new SignatureInvalidException($authentication, '验证失败');
+            throw new SignatureInvalidException($authentication, '验证失败', Constant::DATA_VALIDATION_FAILED_RESPONSE_CODE);
         }
         $signature = $authentication->getBody(Token::SIGNATURE);
         if($signature !== Helper::computeMD5($responseParameters)){
-            throw new SignatureInvalidException($authentication, '数据校验失败');
+            throw new SignatureInvalidException($authentication, '数据校验失败', Constant::DATA_VALIDATION_FAILED_RESPONSE_CODE);
         }
 
         $this->check($authentication, $outer);
@@ -61,13 +61,13 @@ class Decoder{
      */
     protected function check(Authentication $authentication, Application $application): bool{
         if($this->isValid($authentication, $application)){
-            throw new TokenVerifyException('无效的令牌');
+            throw new TokenVerifyException('无效的令牌', Constant::INVALID_TOKEN_RESPONSE_CODE);
         }
         if($this->isExpired($authentication)){
-            throw new TokenVerifyException('令牌已过期');
+            throw new TokenVerifyException('令牌已过期', Constant::TOKEN_HAS_EXPRIED_RESPONSE_CODE);
         }
         if($this->isArrived($authentication)){
-            throw new TokenVerifyException('令牌未达到有效使用时间');
+            throw new TokenVerifyException('令牌未达到有效使用时间', Constant::TOEKN_NOT_USE_RESPONSE_CODE);
         }
         return true;
     }

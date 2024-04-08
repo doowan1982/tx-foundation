@@ -46,7 +46,7 @@ class Token extends GeneralObject implements Signature {
                 'application_id' => $application->id,
                 'signature' => $authentication->signature
             ]);
-        }catch(Exception $e){
+        }catch(\Exception $e){
             throw new TokenException($e->getMessage(), $e->getCode(), $e);
         }
         return $authentication;
@@ -62,7 +62,7 @@ class Token extends GeneralObject implements Signature {
                 'application_id' => $application->id,
                 'signature' => $authentication->signature
             ]);
-        }catch(Exception $e){
+        }catch(\Exception $e){
             throw new TokenException($e->getMessage(), $e->getCode(), $e);
         }
         return true;

@@ -7,9 +7,9 @@ class SignatureInvalidException extends FoundationException {
 
     private $authentication;
 
-    public function __construct(Authentication $authentication, string $message)
+    public function __construct(Authentication $authentication, string $message, int $code = 403)
     {
-        parent::__construct($message, 403);
+        parent::__construct($message, $code);
         $this->authentication = $authentication;
     }
 

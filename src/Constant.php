@@ -53,6 +53,20 @@ class Constant{
     const PUT_REQUEST = 'PUT';
     const DELETE_REQUEST = 'DELETE';
 
+    const APPLICATION_NAME = 'application_id';
+
     const RESPONSE_CODE_OK = 20000;
+
+    const DATA_VALIDATION_FAILED_RESPONSE_CODE = 40000; //数据验证失败
+
+    const INVALID_TOKEN_RESPONSE_CODE = 40003; //无效的TOKEN
+
+    const INVALID_ID_RESPONSE_CODE = 40004; //无效的ID
+    
+    const TOKEN_VALIDATION_FAILED_RESPONSE_CODE = 400010; //令牌验证失败
+
+    const TOKEN_HAS_EXPRIED_RESPONSE_CODE = 40011; //令牌已过期
+
+    const TOEKN_NOT_USE_RESPONSE_CODE = 40012; //令牌无法使用，未到使用时间
 
 }
