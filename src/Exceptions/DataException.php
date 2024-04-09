@@ -20,6 +20,8 @@ class DataException extends Exception{
     public $data;
 
     public function __construct(string $class, $data, string $message){
+        $this->class = $class;
+        $this->data = $data;
         parent::__construct($message);
     }
 

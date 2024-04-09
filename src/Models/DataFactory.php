@@ -17,7 +17,8 @@ class DataFactory
      * @throws DataException
      */
     public static function build(int $type, $data): Data{
-        if(!$data){
+        //如果指明type，同时不是一个数组形式时
+        if($type != 0 && !is_array($data)){
             throw new DataException(DataFactory::class, null, "无效的数据");
         }
         switch($type){

@@ -57,6 +57,8 @@ class Transport extends GeneralObject
 
     private $setting;
 
+    private $body;
+
     public function __construct(Encoder $encoder = null)
     {
         $this->encoder = $encoder;
@@ -119,12 +121,31 @@ class Transport extends GeneralObject
     }
 
     /**
+     * @param ResponseBody $body
+     * @return Transport
+     */
+    public function setResponseBody(ResponseBody $body): Transport{
+        $this->body = $body;
+        return $this;
+    }
+
+    /**
      * @param array $config
      * @return ResponseBody
      * @throws RequestException
      */
     public function send(array $config = []): ResponseBody{
-        $config = $this->assembleConfig($config);
+        return $this->lastSend($config, $this->encoder);
+    }
+
+    /**
+     * @param array $config
+     * @param Encoder $encoder
+     * @return ResponseBody
+     * @throws RequestException
+     */
+    public function lastSend(array $config = [], Encoder $encoder = null){
+        $config = $this->assembleConfig($config, $encoder);
         $client = new Client([
             'base_uri' => "{$this->protocol}://{$this->host}/",
         ] + $config);
@@ -151,10 +172,11 @@ class Transport extends GeneralObject
 
     /**
      * @param array $config
+     * @param Encoder $encoder;
      * @return array
      * @throws \Tesoon\Foundation\Exceptions\TokenException
      */
-    protected function assembleConfig($config = []){
+    protected function assembleConfig($config = [], Encoder $encoder = null){
         $json = $headers = $query = [];
         foreach($this->parameters as $parameter){
             if($parameter instanceof Header) {
@@ -166,15 +188,15 @@ class Transport extends GeneralObject
             }
         }
 
-        if($this->encoder){
+        if($encoder){
             if($this->setting === null){
                 $this->setting = new SignatureSetting();
             }
-            $this->setting->setClaim(Constant::APPLICATION_NAME, $this->encoder->getApplication()->id);
-            $headers[static::AUTHENTICATION] = $this->encoder->encrypt($json + $query, $this->setting);
+            $this->setting->setClaim(Constant::APPLICATION_NAME, $encoder->getApplication()->id);
+            $headers[static::AUTHENTICATION] = $encoder->encrypt($json + $query, $this->setting);
         }
         static::logger()->notice('创建请求体', [
-            'application_id' => $this->encoder ? $this->encoder->getApplication()->id : 0,
+            'application_id' => $encoder ? $encoder->getApplication()->id : 0,
             'url' => "{$this->protocol}://{$this->host}/{$this->uri}",
             'header' => $headers,
             'json' => $json,
@@ -198,6 +220,7 @@ class Transport extends GeneralObject
             ]);
             $content = json_decode($data, true);
             if(is_array($content) && $content['status'] === Constant::RESPONSE_CODE_OK){
+                $responseBody->setCode($content['status'], $content['message']);
                 $responseBody->setResponseParameters($content['data'] ?? []);
             }else{
                 $responseBody->setCode($content['status'] ?? 0, $content['message'] ?? $data);
@@ -209,6 +232,9 @@ class Transport extends GeneralObject
     }
 
     protected function getResponseBody(): ResponseBody{
+        if($this->body != null){
+            return $this->body;
+        }
         return new ResponseBody();
     }
 

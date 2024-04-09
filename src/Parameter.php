@@ -22,7 +22,7 @@ class Parameter extends GeneralObject{
         return new static($query[0], $query[1]);
     }
 
-    public function __construct(string $name, $value, $isGet = true){
+    public function __construct(string $name, $value){
         $this->name = $name;
         $this->value = $value;
     }

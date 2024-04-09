@@ -2,7 +2,6 @@
 namespace Tesoon\Foundation;
 
 use Tesoon\Foundation\Exceptions\TokenException;
-use Tesoon\Foundation\Exceptions\TokenVerifyException;
 
 /**
  * 该接口提供一个抽象实现

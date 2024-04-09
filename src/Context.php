@@ -30,6 +30,22 @@ class Context{
      */
     private $application;
 
+    /**
+     * @var Signature
+     * 
+     */
+    private $signature;
+
+    /**
+     * @var Encoder
+     */
+    private $encoder;
+
+    /**
+     * @var Decoder
+     */
+    private $decoder;
+
     private static $instance;
 
     public static function instance(): Context{
@@ -37,6 +53,16 @@ class Context{
             static::$instance = new static();
         }
         return static::$instance;
+    }
+
+    /**
+     * 绑定Signature的外部实现
+     * @param Signature $signature
+     * @return Context
+     */
+    public function setSignature(Signature $signature): Context{
+        $this->signature = $signature;
+        return $this;
     }
 
     public function prodEnv(): Context{
@@ -61,6 +87,16 @@ class Context{
         return $this;
     }
 
+    public function setEncoder(Encoder $encoder): Context{
+        $this->encoder = $encoder;
+        return $this;
+    }
+
+    public function setDecoder(Decoder $decoder): Context{
+        $this->decoder = $decoder;
+        return $this;
+    }
+
     public function getApplication(): Application{
         return $this->application;
     }
@@ -81,8 +117,13 @@ class Context{
      * @return TransportBuilder
      */
     public function getRequest(): TransportBuilder{
-        return TransportBuilder::create()
-                    ->setEncoder(new Encoder($this->getApplication(), new Token()));
+        if($this->signature === null){
+            $this->signature = new Token();
+        }
+        if($this->encoder === null){
+            $this->encoder = new Encoder($this->getApplication(), $this->signature);
+        }
+        return TransportBuilder::create()->setEncoder($this->encoder);
     }
 
     /**
@@ -97,9 +138,14 @@ class Context{
     public function getResponse(string $ticket, array $parameters, Application $application = null): ResponseBody{
         $authentication = new Authentication();
         $authentication->signature = $ticket;
-        $decoder = new Decoder($this->getApplication(), new Token());
+        if($this->signature === null){
+            $this->signature = new Token();
+        }
+        if($this->decoder === null){
+            $this->decoder = new Decoder($this->getApplication(), $this->signature);
+        }
         try{
-            return $decoder->get($authentication, $application, $parameters);
+            return $this->decoder->get($authentication, $application, $parameters);
         }catch(SignatureInvalidException|DataException|TokenException $e){
             throw $e;
         }

@@ -48,8 +48,8 @@ class ResponseBody extends GeneralObject
     }
 
     /**
-     * @param array $parameters
      * 设置外部的请求参数
+     * @param array $parameters
      * @throws DataException
      */
     public function setResponseParameters(array $parameters){
