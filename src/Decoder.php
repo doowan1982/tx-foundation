@@ -12,32 +12,26 @@ use Tesoon\Foundation\Response\ResponseBody;
 
 class Decoder{
     private $signature;
-    private $application;
 
     /**
-     * @param Application $application 当前应用标识
      * @param Signature $signature
      */
-    public function __construct(Application $application, Signature $signature)
+    public function __construct(Signature $signature)
     {
-        $this->application = $application;
         $this->signature = $signature;
     }
 
     /**
      * @param Authentication $authentication
-     * @param Application|null $outer 外部应用，如果不存在则使用$this->application来进行功能解密、验证、拉取数据
+     * @param Application $application 应用，来进行功能解密、验证、拉取数据
      * @param array $responseParameters 该参数组合顺序需为：$_GET + $_POST形式
      * @return ResponseBody
      * @throws DataException
      * @throws SignatureInvalidException
      * @throws TokenException
      */
-    public function get(Authentication $authentication, Application $outer = null, array $responseParameters = []): ResponseBody{
-        if($outer === null){
-            $outer = $this->application;
-        }
-        if(!$this->signature->decrypt($authentication, $outer)){
+    public function get(Authentication $authentication, Application $application, array $responseParameters = []): ResponseBody{
+        if(!$this->signature->decrypt($authentication, $application)){
             throw new SignatureInvalidException($authentication, '验证失败', Constant::DATA_VALIDATION_FAILED_RESPONSE_CODE);
         }
         $signature = $authentication->getBody(Token::SIGNATURE);
@@ -45,7 +39,7 @@ class Decoder{
             throw new SignatureInvalidException($authentication, '数据校验失败', Constant::DATA_VALIDATION_FAILED_RESPONSE_CODE);
         }
 
-        $this->check($authentication, $outer);
+        $this->check($authentication, $application);
 
         $responseBody = $this->getResponseBody();
         $responseBody->setResponseParameters($responseParameters);

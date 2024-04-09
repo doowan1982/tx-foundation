@@ -1,5 +1,6 @@
 {
     "name": "tx/foundation",
+    "version": "v1.0",
     "autoload": {
         "psr-4": {
             "Tesoon\\Foundation\\": "src/"

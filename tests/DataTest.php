@@ -1,9 +1,7 @@
 <?php
 namespace Tesoon\Tests;
 
-use Monolog\Handler\StreamHandler;
 use PHPUnit\Framework\TestCase;
-use Tesoon\Foundation\GeneralObject;
 use Tesoon\Foundation\Helper;
 use Tesoon\Foundation\Models\Categories\Subject;
 use Tesoon\Foundation\Models\Data;
