@@ -1,5 +1,7 @@
 {
     "name": "tx/foundation",
+    "minimum-stability": "dev",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Tesoon\\Foundation\\": "src/"
