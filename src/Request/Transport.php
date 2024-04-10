@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Tesoon\Foundation\Constant;
 use Tesoon\Foundation\Context;
+use Tesoon\Foundation\EmptyApplication;
 use Tesoon\Foundation\Encoder;
 use Tesoon\Foundation\Exceptions\DataException;
 use Tesoon\Foundation\Exceptions\RequestException;
@@ -174,7 +175,7 @@ class Transport extends GeneralObject
      * @param array $config
      * @param Encoder $encoder;
      * @return array
-     * @throws \Tesoon\Foundation\Exceptions\TokenException
+     * @throws RequestException
      */
     protected function assembleConfig($config = [], Encoder $encoder = null){
         $json = $headers = $query = [];
@@ -188,7 +189,7 @@ class Transport extends GeneralObject
             }
         }
 
-        if($encoder){
+        if($encoder && !($encoder->getApplication() instanceof EmptyApplication)){
             if($this->setting === null){
                 $this->setting = new SignatureSetting();
             }
@@ -202,6 +203,7 @@ class Transport extends GeneralObject
             'json' => $json,
             'query' => $query,
         ]);
+
         return [
             'verify' => $this->protocol === 'https' && Context::instance()->isProd(),
             'headers' => $headers,

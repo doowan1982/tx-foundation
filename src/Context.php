@@ -98,6 +98,9 @@ class Context{
     }
 
     public function getApplication(): Application{
+        if($this->application === null){
+            return EmptyApplication::instance();
+        }
         return $this->application;
     }
 

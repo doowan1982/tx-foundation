@@ -147,9 +147,6 @@ final class TransportBuilder extends \Tesoon\Foundation\GeneralObject
      * @throws FoundationException
      */
     private function initTransport(Transport $transport): Transport{
-        if($this->encoder === null){
-            throw new FoundationException('请指定Encoder实例', 50000);
-        }
         if($this->setting === null){
             $this->setting = new SignatureSetting();
         }
