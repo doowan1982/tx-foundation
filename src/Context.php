@@ -118,6 +118,7 @@ class Context{
 
     /**
      * @return TransportBuilder
+     * @throws TokenException
      */
     public function getRequest(): TransportBuilder{
         if($this->signature === null){
@@ -130,25 +131,31 @@ class Context{
     }
 
     /**
-     * @param string $ticket
+     * @param string|Authentication $ticket
      * @param array $parameters get + rawdata(Content-type:application/json)
-     * @param Application $application 默认为从$this->applicaiton来解析数据，如果指定该值，则由此来解密
      * @return ResponseBody
      * @throws DataException
      * @throws SignatureInvalidException
      * @throws TokenException
      */
-    public function getResponse(string $ticket, array $parameters, Application $application = null): ResponseBody{
-        $authentication = new Authentication();
-        $authentication->signature = $ticket;
+    public function getResponse($ticket, array $parameters): ResponseBody{
+        $authentication = null;
+        if(is_string($ticket)){
+            $authentication = new Authentication();
+            $authentication->signature = $ticket;
+        }else if($ticket instanceof Authentication){
+            $authentication = $ticket;
+        }else{
+            throw new TokenException('ticket仅能未字符串或者Authentication类型');
+        }
         if($this->signature === null){
             $this->signature = new Token();
         }
         if($this->decoder === null){
-            $this->decoder = new Decoder($this->getApplication(), $this->signature);
+            $this->decoder = new Decoder($this->signature);
         }
         try{
-            return $this->decoder->get($authentication, $application, $parameters);
+            return $this->decoder->get($authentication, $this->getApplication(), $parameters);
         }catch(SignatureInvalidException|DataException|TokenException $e){
             throw $e;
         }

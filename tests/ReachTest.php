@@ -12,7 +12,6 @@ use Tesoon\Foundation\Context;
 use Tesoon\Foundation\Exceptions\DataException;
 use Tesoon\Foundation\Exceptions\SignatureInvalidException;
 use Tesoon\Foundation\Exceptions\TokenException;
-use Tesoon\Foundation\GeneralObject;
 use Tesoon\Foundation\Helper;
 use Tesoon\Foundation\Logstash\LogConfig;
 use Tesoon\Foundation\Models\Admin;
@@ -20,7 +19,6 @@ use Tesoon\Foundation\Models\ApplicationKey;
 use Tesoon\Foundation\Models\DataFactory;
 use Tesoon\Foundation\Models\EnterpriseOrganization;
 use Tesoon\Foundation\Models\Lists;
-use Tesoon\Foundation\DefaultSignature as Signature;
 use Tesoon\Foundation\Decoder;
 use Tesoon\Foundation\Models\LoginInfo;
 use Tesoon\Foundation\SignatureSetting;
@@ -87,14 +85,13 @@ class ReachTest extends TestCase{
      * @depends testGenerateTicket
      */
     public function testReach(Authentication $authentication){
-        $application = static::getApplication();
-        $reach = new Decoder($application, new Token());
+        $reach = new Decoder(new Token());
         $parameters = [
             'type' => Constant::ADMIN_PUSH_TYPE,
             'content' => $this->getTestJSON('admin.json'),
         ];
         try{
-            $data = $reach->get($authentication, null, $parameters)->getData();
+            $data = $reach->get($authentication, static::getApplication(), $parameters)->getData();
             $this->assertNotNull($data, '获取无效的Data');
             $this->assertTrue($data instanceof Lists, '获取管理员数据失败');
             $this->assertAdminTest($data, $parameters['content']);
@@ -107,7 +104,7 @@ class ReachTest extends TestCase{
      * @depends testGenerateTicket
      */
     public function testContextResponse(Authentication $authentication){
-        $body = Context::instance()->getResponse($authentication->signature, [
+        $body = Context::instance()->getResponse($authentication, [
             'content' => $this->getTestJSON('admin.json'),
             'type' => Constant::ADMIN_PUSH_TYPE
         ]);
